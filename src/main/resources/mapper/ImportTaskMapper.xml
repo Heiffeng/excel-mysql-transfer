@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="site.achun.tools.transfer.generator.mapper.ImportTaskMapper">
+
+    <resultMap id="BaseResultMap" type="site.achun.tools.transfer.generator.domain.ImportTask">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="tableName" column="table_name" jdbcType="VARCHAR"/>
+            <result property="tableInfo" column="table_info" jdbcType="OTHER"/>
+            <result property="creator" column="creator" jdbcType="VARCHAR"/>
+            <result property="ctime" column="ctime" jdbcType="TIMESTAMP"/>
+            <result property="utime" column="utime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,table_name,
+        table_info,creator,ctime,
+        utime
+    </sql>
+</mapper>
