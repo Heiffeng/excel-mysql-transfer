@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c3d4d422-5373-49df-a8e0-e597aa60f1c4" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/script/init.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/TransferApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/common/Rsp.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/controller/LogController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/controller/TaskController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/core/CreateTableService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/core/MySQLTableGenerator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/core/TableMappingInfo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/generator/domain/ImportLog.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/generator/domain/ImportTask.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/generator/mapper/ImportLogMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/generator/mapper/ImportTaskMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/generator/service/ImportLogService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/generator/service/ImportTaskService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/generator/service/impl/ImportLogServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/site/achun/tools/transfer/generator/service/impl/ImportTaskServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/ImportLogMapper.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/ImportTaskMapper.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/site/achun/tools/transfer/TransferApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/site/achun/tools/transfer/core/MySQLTableGeneratorTest.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="customMavenHome" value="C:\Program Files\apache-maven-3.9.8" />
+        <option name="mavenHomeTypeForPersistence" value="CUSTOM" />
+        <option name="userSettingsFile" value="C:\root\config\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="MavenRunner">
+    <option name="skipTests" value="true" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2mEMQrIYdY9tMmkwlNkC6oNt19o" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JUnit.MySQLTableGeneratorTest.generator.executor": "Run",
+    "JUnit.TableServiceTest.createTable.executor": "Run",
+    "Maven.excel-mysql-transfer [clean].executor": "Run",
+    "Maven.excel-mysql-transfer [package].executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Spring Boot.ExcelMysqlTransferApplication.executor": "Run",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/workspace/github/excel-mysql-transfer",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "MavenSettings",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ]
+  }
+}]]></component>
+  <component name="RunManager" selected="JUnit.MySQLTableGeneratorTest.generator">
+    <configuration name="MySQLTableGeneratorTest.generator" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="excel-mysql-transfer" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="site.achun.tools.transfer.core.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="site.achun.tools.transfer.core" />
+      <option name="MAIN_CLASS_NAME" value="site.achun.tools.transfer.core.MySQLTableGeneratorTest" />
+      <option name="METHOD_NAME" value="generator" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TableServiceTest.createTable" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="excel-mysql-transfer" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="site.achun.tools.transfer.jdbc.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="site.achun.tools.transfer.jdbc" />
+      <option name="MAIN_CLASS_NAME" value="site.achun.tools.transfer.jdbc.TableServiceTest" />
+      <option name="METHOD_NAME" value="createTable" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TransferApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="excel-mysql-transfer" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="site.achun.tools.transfer.TransferApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.MySQLTableGeneratorTest.generator" />
+        <item itemvalue="JUnit.TableServiceTest.createTable" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.18034.62" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.18034.62" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c3d4d422-5373-49df-a8e0-e597aa60f1c4" name="Changes" comment="" />
+      <created>1726637268842</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1726637268842</updated>
+      <workItem from="1726637269863" duration="827000" />
+      <workItem from="1726638113200" duration="3289000" />
+      <workItem from="1726641773925" duration="8660000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
