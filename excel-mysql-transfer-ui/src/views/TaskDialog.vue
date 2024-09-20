@@ -12,16 +12,16 @@
     <el-upload
         class="upload-demo"
         drag
-        action="https://your-api-endpoint/upload"
+        :action="API_HOST +'/upload/init'"
     :on-success="handleUploadSuccess"
     :on-error="handleUploadError"
     :limit="1"
     :auto-upload="true"
-    accept=".xls,.xlsx"
+    accept=".xls,.xlsx,.csv"
     >
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">点击或者拖拽文件到此处上传</div>
-      <div class="el-upload__tip">只支持Excel文件（.xls, .xlsx）</div>
+      <div class="el-upload__tip">只支持Excel文件（.xls, .xlsx, .csv）</div>
     </el-upload>
 
     <div class="form-container">
@@ -68,6 +68,8 @@ interface FieldMapping {
   fieldName: string;
   excelHeader: string;
 }
+
+const API_HOST = import.meta.env.VITE_API_HOST
 
 const formRows = ref([
   { checked: true, excel: '图书编码', mysql: 'a4', dataType: 'VARCHAR(50)', comment: '图书编码' },
