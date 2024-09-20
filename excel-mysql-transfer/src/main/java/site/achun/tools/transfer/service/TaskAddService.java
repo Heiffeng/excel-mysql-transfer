@@ -34,7 +34,7 @@ public class TaskAddService {
                 .name(addTaskRequest.getTaskName())
                 .tableName(addTaskRequest.getTableName())
                 .tableInfo(JSON.toJSONString(addTaskRequest))
-                .creator("Admin")
+                .creator("admin")
                 .utime(LocalDateTime.now())
                 .ctime(LocalDateTime.now())
                 .build();

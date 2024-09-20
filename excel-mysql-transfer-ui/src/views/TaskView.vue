@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
-import { defineComponent, ref } from 'vue'
+import {onMounted, ref} from 'vue';
+import axios from 'axios';
+import { ElMessageBox } from 'element-plus';
+import TaskDialog from "@/views/TaskDialog.vue";
 
 interface Task {
   id: number
@@ -8,10 +10,17 @@ interface Task {
   status: string
 }
 
-import { ElMessageBox } from 'element-plus'
-import TaskDialog from "@/views/TaskDialog.vue";
+const dialogVisible = ref(false);
+const selectedTaskId = ref<number | null>(null);
+const tasks = ref<Task[]>([]);
+const total = ref(0);
+const pageSize = ref(10);
+const currentPage = ref(1);
 
-const dialogVisible = ref(false)
+const openDialog = (taskId: number | null) => {
+  selectedTaskId.value = taskId;
+  dialogVisible.value = true;
+};
 
 const handleClose = (done: () => void) => {
   ElMessageBox.confirm('Are you sure to close this dialog?')
@@ -22,18 +31,26 @@ const handleClose = (done: () => void) => {
         // catch error
       })
 }
-const selectedTaskId = ref<number | null>(null);
-const openDialog = (taskId: number | null) => {
-  selectedTaskId.value = taskId;
-  dialogVisible.value = true;
+
+// 获取任务数据
+const fetchTasks = async (page: number, size: number) => {
+  try {
+    const response = await axios.post('/task/query-task-page', {
+      pageIndex:page,
+      pageSize:size,
+    });
+    tasks.value = response.data.data.rows;
+    total.value = response.data.data.total; // 假设接口返回总记录数
+  } catch (error) {
+    console.error('获取任务数据失败:', error);
+  }
 };
 
-// 使用ref定义任务数组
-const tasks = ref<Task[]>([
-  { id: 1, name: '任务 1', status: '已完成' },
-  { id: 2, name: '任务 2', status: '进行中' },
-  { id: 3, name: '任务 3', status: '待开始' }
-])
+// 分页变化时触发
+const handlePageChange = (newPage: number) => {
+  currentPage.value = newPage;
+  fetchTasks(currentPage.value, pageSize.value);
+};
 
 // 新建任务
 const createTask = () => {
@@ -56,30 +73,43 @@ const deleteTask = (task: Task) => {
   tasks.value = tasks.value.filter(t => t.id !== task.id)
 }
 
+// 初次加载时获取数据
+onMounted(() => {
+  fetchTasks(currentPage.value, pageSize.value);
+});
+
 </script>
 
-<template>
-  <div class="task-page">
-    <el-button type="primary" @click="openDialog(null)" class="create-btn">新建任务</el-button>
-    <el-table :data="tasks" style="width: 100%" class="task-table">
-      <el-table-column prop="id" label="ID" width="50"></el-table-column>
-      <el-table-column prop="name" label="任务名称"></el-table-column>
-      <el-table-column prop="name" label="表名"></el-table-column>
-      <el-table-column prop="name" label="负责人"></el-table-column>
-      <el-table-column prop="name" label="记录数"></el-table-column>
-      <el-table-column prop="name" label="更新时间"></el-table-column>
-      <el-table-column prop="status" label="状态"></el-table-column>
-      <el-table-column label="操作" width="250">
-        <template v-slot="scope">
-          <el-button @click="openDialog(scope.row.id)" type="text" class="action-btn">查看</el-button>
-          <el-button @click="openDialog(scope.row.id)" type="text" class="action-btn">编辑</el-button>
-          <el-button @click="editTask(scope.row)" type="text" class="action-btn">导入</el-button>
-          <el-button @click="deleteTask(scope.row)" type="text" class="action-btn">日志</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-  </div>
+<template> <div class="task-page">
+  <el-button type="primary" @click="openDialog(null)" class="create-btn">新建任务</el-button>
+  <el-table :data="tasks" style="width: 100%" class="task-table">
+    <el-table-column prop="id" label="ID" width="50"></el-table-column>
+    <el-table-column prop="name" label="任务名称"></el-table-column>
+    <el-table-column prop="tableName" label="表名"></el-table-column>
+    <el-table-column prop="creator" label="负责人"></el-table-column>
+    <el-table-column prop="name" label="记录数"></el-table-column>
+    <el-table-column prop="utime" label="更新时间" width="180"></el-table-column>
+    <el-table-column prop="name" label="状态"></el-table-column>
+    <el-table-column label="操作" width="250">
+      <template v-slot="scope">
+        <el-button @click="openDialog(scope.row.id)" type="text" class="action-btn">查看</el-button>
+        <el-button @click="openDialog(scope.row.id)" type="text" class="action-btn">编辑</el-button>
+        <el-button @click="editTask(scope.row)" type="text" class="action-btn">导入</el-button>
+        <el-button @click="deleteTask(scope.row)" type="text" class="action-btn">日志</el-button>
+      </template>
+    </el-table-column>
+  </el-table>
 
+  <!-- 分页组件 -->
+  <el-pagination
+      v-model:current-page="currentPage"
+      :page-size="pageSize"
+      :total="total"
+      @current-change="handlePageChange"
+      layout="total, prev, pager, next, jumper"
+      class="pagination"
+  />
+</div>
 
   <!-- 新增和更新弹窗 -->
   <el-dialog
@@ -89,14 +119,6 @@ const deleteTask = (task: Task) => {
       :before-close="handleClose"
   >
     <task-dialog :taskId="selectedTaskId" />
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="dialogVisible = false">
-          Confirm
-        </el-button>
-      </div>
-    </template>
   </el-dialog>
 
 </template>
@@ -142,5 +164,10 @@ const deleteTask = (task: Task) => {
 
 .action-btn:hover {
   color: #66b1ff;
+}
+
+.pagination {
+  margin-top: 20px;
+  text-align: right;
 }
 </style>

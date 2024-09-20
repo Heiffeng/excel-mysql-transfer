@@ -20,8 +20,8 @@ public class MySQLTableGeneratorTest {
 
         // 设置字段映射
         List<TableMappingInfo.Mapping> fields = new ArrayList<>();
-        fields.add(new TableMappingInfo.Mapping("id","ID","INT PRIMARY KEY AUTO_INCREMENT"));
-        fields.add(new TableMappingInfo.Mapping("name","Name","VARCHAR(255)"));
+        fields.add(new TableMappingInfo.Mapping("id","ID","INT PRIMARY KEY AUTO_INCREMENT",""));
+        fields.add(new TableMappingInfo.Mapping("name","Name","VARCHAR(255)",""));
 
         tableMappingInfo.setFields(fields);
 

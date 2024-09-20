@@ -1,17 +1,24 @@
 package site.achun.tools.transfer.controller;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import site.achun.tools.transfer.common.Rsp;
+import site.achun.tools.transfer.common.RspPage;
 import site.achun.tools.transfer.controller.request.AddTaskRequest;
+import site.achun.tools.transfer.controller.request.QueryTaskPage;
+import site.achun.tools.transfer.controller.response.TaskResponse;
 import site.achun.tools.transfer.generator.domain.ImportTask;
 import site.achun.tools.transfer.generator.service.ImportTaskService;
 import site.achun.tools.transfer.service.TaskAddService;
+import site.achun.tools.transfer.utils.PageUtil;
 
 /**
  * Task CURD Controller
@@ -24,6 +31,7 @@ import site.achun.tools.transfer.service.TaskAddService;
 public class TaskController {
 
     private final TaskAddService taskAddService;
+    private final ImportTaskService importTaskService;
 
     /**
      * 新增任务
@@ -74,9 +82,17 @@ public class TaskController {
         return null;
     }
 
+    /**
+     * 查询任务分页数据
+     * @param query 查询条件
+     * @return 返回分页
+     */
     @PostMapping("/task/query-task-page")
-    public Rsp<ImportTask> getTaskPage(@RequestBody ImportTask task) {
-        return null;
+    public Rsp<RspPage<TaskResponse>> getTaskPage(@RequestBody QueryTaskPage query) {
+        Page<ImportTask> pageResult = importTaskService.lambdaQuery()
+                .eq(StrUtil.isNotEmpty(query.getCreator()), ImportTask::getCreator, query.getCreator())
+                .page(Page.of(query.getPageIndex(), query.getPageSize()));
+        return Rsp.success(PageUtil.parse(pageResult, v -> BeanUtil.toBean(v, TaskResponse.class),query.getPageIndex(),query.getPageSize()));
     }
 
 }
