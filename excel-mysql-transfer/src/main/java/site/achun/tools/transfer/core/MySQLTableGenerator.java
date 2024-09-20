@@ -32,7 +32,7 @@ public class MySQLTableGenerator {
             fieldsSQL.append(String.format(FIELD_TEMPLATE,
                     field.getField(),
                     field.getDataType(),
-                    field.getColumn()));
+                    field.getHeader()));
             // 如果不是最后一个字段，添加逗号
             if (i < fields.size() - 1) {
                 fieldsSQL.append(",");

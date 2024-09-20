@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CSVService {
 
-    public List<String> readRows(MultipartFile file) {
+    public List<String> readHeaders(MultipartFile file) {
         List<String> firstRow = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {

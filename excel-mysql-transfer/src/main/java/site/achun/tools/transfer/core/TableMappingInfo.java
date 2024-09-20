@@ -30,8 +30,10 @@ public class TableMappingInfo {
         // 数据库字段名
         private String field;
         // Excel字段名
-        private String column;
+        private String header;
         // 数据类型
         private String dataType;
+        // 字段备注
+        private String comment;
     }
 }

@@ -25,7 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ExcelService {
 
-    public List<String> readRows(MultipartFile file) {
+    public List<String> readHeaders(MultipartFile file) {
         try (InputStream inputStream = file.getInputStream()) {
             // 读取 Excel 第一行
             List<Map<Integer, String>> rows = EasyExcel.read(inputStream)

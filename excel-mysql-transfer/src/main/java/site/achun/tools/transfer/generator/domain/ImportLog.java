@@ -6,7 +6,11 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * import_log
@@ -15,6 +19,9 @@ import lombok.Data;
  */
 @TableName(value ="import_log")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ImportLog implements Serializable {
     /**
      * ID

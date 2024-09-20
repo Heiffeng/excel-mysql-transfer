@@ -1,16 +1,17 @@
 package site.achun.tools.transfer.controller;
 
+import com.alibaba.excel.util.StringUtils;
+import com.alibaba.fastjson2.JSON;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import site.achun.tools.transfer.common.Rsp;
+import site.achun.tools.transfer.controller.request.AddTaskRequest;
 import site.achun.tools.transfer.generator.domain.ImportTask;
 import site.achun.tools.transfer.generator.service.ImportTaskService;
-
-import java.util.Arrays;
-import java.util.List;
+import site.achun.tools.transfer.service.TaskAddService;
 
 /**
  * Task CURD Controller
@@ -22,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TaskController {
 
-    private final ImportTaskService importTaskService;
+    private final TaskAddService taskAddService;
 
     /**
      * 新增任务
@@ -30,8 +31,16 @@ public class TaskController {
      * @return 新增任务的结果
      */
     @PostMapping("/task/add")
-    public Rsp<Void> addTask(@RequestBody ImportTask task) {
-        return null;
+    public Rsp<Void> addTask(@RequestBody AddTaskRequest addTaskRequest) {
+        log.info("add task request: {}", JSON.toJSONString(addTaskRequest));
+        if(StringUtils.isEmpty(addTaskRequest.getTableName())){
+            return Rsp.error("table name is empty");
+        }
+        if(StringUtils.isEmpty(addTaskRequest.getTaskName())){
+            return Rsp.error("task name is empty");
+        }
+        taskAddService.addTask(addTaskRequest);
+        return Rsp.success(null);
     }
 
     /**
