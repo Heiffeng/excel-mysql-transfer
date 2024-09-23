@@ -20,6 +20,8 @@ import site.achun.tools.transfer.generator.service.ImportTaskService;
 import site.achun.tools.transfer.service.TaskAddService;
 import site.achun.tools.transfer.utils.PageUtil;
 
+import java.sql.SQLException;
+
 /**
  * Task CURD Controller
  * &#064;Author Heiffeng
@@ -47,7 +49,11 @@ public class TaskController {
         if(StringUtils.isEmpty(addTaskRequest.getTaskName())){
             return Rsp.error("task name is empty");
         }
-        taskAddService.addTask(addTaskRequest);
+        try {
+            taskAddService.addTask(addTaskRequest);
+        } catch (Exception ex) {
+            return Rsp.error(ex.getMessage());
+        }
         return Rsp.success(null);
     }
 
@@ -91,6 +97,7 @@ public class TaskController {
     public Rsp<RspPage<TaskResponse>> getTaskPage(@RequestBody QueryTaskPage query) {
         Page<ImportTask> pageResult = importTaskService.lambdaQuery()
                 .eq(StrUtil.isNotEmpty(query.getCreator()), ImportTask::getCreator, query.getCreator())
+                .orderByDesc(ImportTask::getCtime)
                 .page(Page.of(query.getPageIndex(), query.getPageSize()));
         return Rsp.success(PageUtil.parse(pageResult, v -> BeanUtil.toBean(v, TaskResponse.class),query.getPageIndex(),query.getPageSize()));
     }

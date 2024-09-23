@@ -32,6 +32,11 @@ const handleClose = (done: () => void) => {
       })
 }
 
+const formSubmitted = () => {
+  dialogVisible.value = false;
+  fetchTasks(1,pageSize.value);
+}
+
 // 获取任务数据
 const fetchTasks = async (page: number, size: number) => {
   try {
@@ -118,7 +123,10 @@ onMounted(() => {
       width="800"
       :before-close="handleClose"
   >
-    <task-dialog :taskId="selectedTaskId" />
+    <task-dialog
+        :taskId="selectedTaskId"
+        @formSubmitted="formSubmitted"
+    />
   </el-dialog>
 
 </template>

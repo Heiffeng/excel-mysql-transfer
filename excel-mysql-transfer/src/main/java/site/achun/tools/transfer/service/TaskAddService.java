@@ -10,11 +10,17 @@ package site.achun.tools.transfer.service;
 import com.alibaba.fastjson2.JSON;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import site.achun.tools.transfer.controller.request.AddTaskRequest;
+import site.achun.tools.transfer.core.CreateTableService;
 import site.achun.tools.transfer.generator.domain.ImportTask;
 import site.achun.tools.transfer.generator.service.ImportTaskService;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 /**
@@ -29,7 +35,25 @@ public class TaskAddService {
 
     private final ImportTaskService importTaskService;
 
-    public void addTask(AddTaskRequest addTaskRequest){
+    private final DataSource dataSource;
+
+    @Transactional
+    public void addTask(AddTaskRequest addTaskRequest) throws SQLException,RuntimeException {
+        // 验证表名是否存在
+        ImportTask existTask = importTaskService.lambdaQuery()
+                .eq(ImportTask::getTableName, addTaskRequest.getTableName())
+                .eq(ImportTask::getStatus, 1)
+                .last("limit 1")
+                .one();
+        if(existTask != null){
+            throw new RuntimeException("tableName already exist");
+        }
+
+        // 执行建表语句
+        CreateTableService createTableService = new CreateTableService(dataSource.getConnection());
+        boolean createResult = createTableService.createTable(addTaskRequest);
+        log.info("create table result: {}", createResult);
+
         ImportTask importTask = ImportTask.builder()
                 .name(addTaskRequest.getTaskName())
                 .tableName(addTaskRequest.getTableName())

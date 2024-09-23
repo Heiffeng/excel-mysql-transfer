@@ -25,21 +25,22 @@ public class MySQLTableGenerator {
 
         // 遍历字段并构建字段部分的 SQL
         List<TableMappingInfo.Mapping> fields = tableMappingInfo.getFields();
-        for (int i = 0; i < fields.size(); i++) {
-            TableMappingInfo.Mapping field = fields.get(i);
-
+        String primaryKey = null;
+        for (TableMappingInfo.Mapping field : fields) {
             // 使用字段模板构建每个字段的 SQL 语句，包括字段名、数据类型和备注
             fieldsSQL.append(String.format(FIELD_TEMPLATE,
                     field.getField(),
                     field.getDataType(),
                     field.getHeader()));
-            // 如果不是最后一个字段，添加逗号
-            if (i < fields.size() - 1) {
-                fieldsSQL.append(",");
+            fieldsSQL.append(",\n");
+            if (field.getComment() != null && field.getComment().equals("Primary Key")) {
+                primaryKey = field.getField();
             }
-            fieldsSQL.append("\n");
         }
-
+        if(primaryKey == null){
+            throw new RuntimeException("Primary Key is null");
+        }
+        fieldsSQL.append("PRIMARY KEY (`").append(primaryKey).append("`) \n");
         // 使用建表模板构建最终的 SQL 语句
         return String.format(CREATE_TABLE_TEMPLATE, tableMappingInfo.getTableName(), fieldsSQL.toString());
     }

@@ -8,15 +8,16 @@
             <id property="id" column="id" jdbcType="INTEGER"/>
             <result property="name" column="name" jdbcType="VARCHAR"/>
             <result property="tableName" column="table_name" jdbcType="VARCHAR"/>
-            <result property="tableInfo" column="table_info" jdbcType="VARCHAR"/>
+            <result property="tableInfo" column="table_info" jdbcType="OTHER"/>
             <result property="creator" column="creator" jdbcType="VARCHAR"/>
+            <result property="status" column="status" jdbcType="TINYINT"/>
             <result property="ctime" column="ctime" jdbcType="TIMESTAMP"/>
             <result property="utime" column="utime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,name,table_name,
-        table_info,creator,ctime,
-        utime
+        table_info,creator,status,
+        ctime,utime
     </sql>
 </mapper>

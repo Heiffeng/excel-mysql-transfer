@@ -89,7 +89,7 @@ const handleUploadSuccess = (response: any) => {
       checked: true,
       header: '',
       field: 'id',
-      dataType: 'INT',
+      dataType: 'INT UNSIGNED NOT NULL AUTO_INCREMENT',
       comment: 'Primary Key'
     },
     ...dynamicRows,
@@ -112,6 +112,7 @@ const handleUploadError = (error: any) => {
 const resetForm = () => {
   // 重置表单和状态
   task.value.tableName = '';
+  task.value.taskName = '';
   formRows.value = [];
   status.showUpload = true;
   status.showTable = false;
@@ -130,6 +131,7 @@ const submitForm = async () => {
 
     if (response.data.code == 0) {
       ElMessage.success('提交成功');
+      resetForm();
       // 通过 emit 通知父组件表单提交成功
       emit('formSubmitted');
     } else {
