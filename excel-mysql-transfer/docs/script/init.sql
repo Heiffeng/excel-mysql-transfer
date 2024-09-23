@@ -4,10 +4,12 @@ CREATE TABLE `import_task` (
                                `table_name` varchar(255) NOT NULL COMMENT '表名',
                                `table_info` json DEFAULT NULL COMMENT '表信息，包含字段映射',
                                `creator` varchar(255) DEFAULT NULL COMMENT '创建者',
+                               `status` tinyint default 1 COMMENT '状态，1.正常 2.禁用',
                                `ctime` datetime DEFAULT NULL COMMENT '创建时间',
                                `utime` datetime DEFAULT NULL COMMENT '更新时间',
                                PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
+
 
 CREATE TABLE `import_log` (
                               `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
