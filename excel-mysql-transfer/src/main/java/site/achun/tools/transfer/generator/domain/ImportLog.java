@@ -40,6 +40,11 @@ public class ImportLog implements Serializable {
     private Integer count;
 
     /**
+     * 导入文件名称
+     */
+    private String fileName;
+
+    /**
      * 操作人
      */
     private String creator;
@@ -67,6 +72,7 @@ public class ImportLog implements Serializable {
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getTaskId() == null ? other.getTaskId() == null : this.getTaskId().equals(other.getTaskId()))
             && (this.getCount() == null ? other.getCount() == null : this.getCount().equals(other.getCount()))
+            && (this.getFileName() == null ? other.getFileName() == null : this.getFileName().equals(other.getFileName()))
             && (this.getCreator() == null ? other.getCreator() == null : this.getCreator().equals(other.getCreator()))
             && (this.getCtime() == null ? other.getCtime() == null : this.getCtime().equals(other.getCtime()));
     }
@@ -78,6 +84,7 @@ public class ImportLog implements Serializable {
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getTaskId() == null) ? 0 : getTaskId().hashCode());
         result = prime * result + ((getCount() == null) ? 0 : getCount().hashCode());
+        result = prime * result + ((getFileName() == null) ? 0 : getFileName().hashCode());
         result = prime * result + ((getCreator() == null) ? 0 : getCreator().hashCode());
         result = prime * result + ((getCtime() == null) ? 0 : getCtime().hashCode());
         return result;
@@ -92,6 +99,7 @@ public class ImportLog implements Serializable {
         sb.append(", id=").append(id);
         sb.append(", taskId=").append(taskId);
         sb.append(", count=").append(count);
+        sb.append(", fileName=").append(fileName);
         sb.append(", creator=").append(creator);
         sb.append(", ctime=").append(ctime);
         sb.append(", serialVersionUID=").append(serialVersionUID);

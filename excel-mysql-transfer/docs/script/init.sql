@@ -15,9 +15,10 @@ CREATE TABLE `import_log` (
                               `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
                               `task_id` int NOT NULL COMMENT '任务ID',
                               `count` int NOT NULL COMMENT '导入数据总数',
+                              `file_name` varchar(255) DEFAULT NULL COMMENT '导入文件名称',
                               `creator` varchar(255) DEFAULT NULL COMMENT '操作人',
                               `ctime` datetime NOT NULL COMMENT '导入时间',
                               PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 
 
