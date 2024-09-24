@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -54,6 +56,7 @@ public class ImportLog implements Serializable {
      */
     private LocalDateTime ctime;
 
+    @Serial
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 

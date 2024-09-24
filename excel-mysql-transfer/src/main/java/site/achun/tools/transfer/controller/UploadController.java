@@ -8,16 +8,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import site.achun.tools.transfer.common.Rsp;
+import site.achun.tools.transfer.controller.response.ImportResult;
 import site.achun.tools.transfer.controller.response.UploadInitResponse;
 import site.achun.tools.transfer.core.TableMappingInfo;
+import site.achun.tools.transfer.generator.domain.ImportLog;
 import site.achun.tools.transfer.generator.domain.ImportTask;
+import site.achun.tools.transfer.generator.service.ImportLogService;
 import site.achun.tools.transfer.generator.service.ImportTaskService;
 import site.achun.tools.transfer.service.CSVService;
 import site.achun.tools.transfer.service.ExcelService;
 import site.achun.tools.transfer.service.ImportService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +39,9 @@ public class UploadController {
 
     private final ImportTaskService taskService;
     private final ImportService importService;
+
+    private final ImportLogService importLogService;
+
     /**
      * 初始化导入模板
      * @param file 上传的excel文件
@@ -78,10 +84,11 @@ public class UploadController {
      * @return 返回内容
      */
     @PostMapping("/upload/import")
-    public Rsp<UploadInitResponse> uploadImport(
+    public Rsp<ImportResult> uploadImport(
             @RequestParam("taskId")Integer taskId,
             @RequestParam("file") MultipartFile file
     ) {
+        long begin = System.currentTimeMillis();
         if(taskId == null || file == null) {
             return Rsp.error("params is null");
         }
@@ -100,6 +107,9 @@ public class UploadController {
         if (fileName == null) {
             return Rsp.error("文件名不能为空");
         }
+
+        // TODO 保存文件到本地
+
 
         String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
 
@@ -122,6 +132,22 @@ public class UploadController {
         TableMappingInfo mappingInfo = JSON.parseObject(task.getTableInfo(), TableMappingInfo.class);
         importService.importData(mappingInfo,dataList);
 
-        return Rsp.success(null);
+        // 插入日志
+        ImportLog importLog = ImportLog.builder()
+                .taskId(taskId)
+                .count(dataList.size())
+                .fileName(fileName)
+                .creator("admin")
+                .ctime(LocalDateTime.now())
+                .build();
+        boolean result = importLogService.save(importLog);
+        log.info("log save result:{}",result);
+
+        long end = System.currentTimeMillis();
+        ImportResult importResult = ImportResult.builder()
+                .cost(end - begin)
+                .count(dataList.size())
+                .build();
+        return Rsp.success(importResult);
     }
 }

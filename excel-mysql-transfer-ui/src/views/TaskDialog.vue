@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+
 import {reactive, ref, watch} from 'vue';
 import {ElMessage} from "element-plus";
 import axios from "axios";
@@ -49,8 +50,11 @@ const importSuccess = ref<boolean>(false);
 const importedCount = ref(0);
 
 const handleUploadImportSuccess = (response: any) => {
-  importSuccess.value = true;
-  importedCount.value = 102;
+  console.log(response);
+  if(response.code == 0){
+    importSuccess.value = true;
+    importedCount.value = response.data.count;
+  }
 }
 
 const handleUploadSuccess = (response: any) => {

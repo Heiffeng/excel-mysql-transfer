@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {onMounted, reactive, ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import axios from 'axios';
-import { ElMessageBox } from 'element-plus';
 import TaskDialog from "@/views/TaskDialog.vue";
+import TaskLog from "@/views/TaskLog.vue";
 
 export interface Task {
   id: number
@@ -19,6 +19,8 @@ export interface DialogInfo {
 }
 
 const dialogVisible = ref(false);
+const logDialogVisible = ref(false);
+const logTaskId = ref<number>(0);
 
 const dialogInfo = ref<DialogInfo>({
   type:1,
@@ -36,14 +38,18 @@ const openDialog = (info : DialogInfo) => {
   dialogVisible.value = true;
 };
 
+const openLogDialog = (task:Task) => {
+  logTaskId.value = task.id;
+  logDialogVisible.value = true;
+}
+
 const handleClose = (done: () => void) => {
-  ElMessageBox.confirm('Are you sure to close this dialog?')
-      .then(() => {
-        done()
-      })
-      .catch(() => {
-        // catch error
-      })
+  done()
+}
+
+const handleLogDialogClose = (done: () => void) => {
+  logDialogVisible.value = false;
+  done();
 }
 
 const formSubmitted = () => {
@@ -71,30 +77,14 @@ const handlePageChange = (newPage: number) => {
   fetchTasks(currentPage.value, pageSize.value);
 };
 
-// 新建任务
-const createTask = () => {
-  const newTask: Task = {
-    id: tasks.value.length + 1,
-    name: `任务 ${tasks.value.length + 1}`,
-    status: '待开始'
-  }
-  tasks.value.push(newTask)
-}
-
 // 编辑任务（可以实现具体逻辑）
-const editTask = (task: Task) => {
-  console.log('编辑任务:', task)
+const importFile = (task: Task) => {
   // 实现具体的编辑逻辑
   openDialog({
     task: task,
     title: "导入数据" + "["+task.name+"]",
     type: 3,
   })
-}
-
-// 删除任务
-const deleteTask = (task: Task) => {
-  tasks.value = tasks.value.filter(t => t.id !== task.id)
 }
 
 // 初次加载时获取数据
@@ -122,9 +112,8 @@ onMounted(() => {
     <el-table-column label="操作" width="250">
       <template v-slot="scope">
         <el-button @click="openDialog({type:2,title:'查看任务',task:scope.row})" type="text" class="action-btn">查看</el-button>
-<!--        <el-button @click="openDialog(scope.row.id)" type="text" class="action-btn">禁用</el-button>-->
-        <el-button @click="editTask(scope.row)" v-if="scope.row.status == 1" type="text" class="action-btn">导入</el-button>
-        <el-button @click="deleteTask(scope.row)" type="text" class="action-btn">日志</el-button>
+        <el-button @click="importFile(scope.row)" v-if="scope.row.status == 1" type="text" class="action-btn">导入</el-button>
+        <el-button @click="openLogDialog(scope.row)" type="text" class="action-btn">日志</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -151,6 +140,16 @@ onMounted(() => {
         :info="dialogInfo"
         @formSubmitted="formSubmitted"
     />
+  </el-dialog>
+
+  <!-- 查看日志的弹窗 -->
+  <el-dialog
+      v-model="logDialogVisible"
+      title="查看日志"
+      width="800"
+      :before-close="handleLogDialogClose"
+  >
+    <task-log :task-id="logTaskId" :visible ="logDialogVisible" />
   </el-dialog>
 
 </template>

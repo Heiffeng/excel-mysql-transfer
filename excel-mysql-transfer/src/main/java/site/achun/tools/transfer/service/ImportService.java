@@ -5,11 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.achun.tools.transfer.core.TableMappingInfo;
+import site.achun.tools.transfer.generator.domain.ImportLog;
+import site.achun.tools.transfer.generator.service.ImportLogService;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -24,6 +27,7 @@ import java.util.StringJoiner;
 @RequiredArgsConstructor
 public class ImportService {
 
+
     private final DataSource dataSource;
     private static final int BATCH_SIZE = 1000; // 每次批量插入1000条
 
@@ -34,7 +38,6 @@ public class ImportService {
      */
     @Transactional
     public void importData(TableMappingInfo mappingInfo, List<Map<String,String>> dataList){
-        // TODO 实现代码，需要事务，要么全部导入成功，要么全部失败
         // 检查数据
         if (dataList == null || dataList.isEmpty()) {
             log.warn("数据列表为空，跳过导入");
