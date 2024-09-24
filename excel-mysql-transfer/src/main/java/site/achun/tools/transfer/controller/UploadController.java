@@ -1,5 +1,6 @@
 package site.achun.tools.transfer.controller;
 
+import com.alibaba.fastjson2.JSON;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,8 +9,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import site.achun.tools.transfer.common.Rsp;
 import site.achun.tools.transfer.controller.response.UploadInitResponse;
+import site.achun.tools.transfer.core.TableMappingInfo;
+import site.achun.tools.transfer.generator.domain.ImportTask;
+import site.achun.tools.transfer.generator.service.ImportTaskService;
 import site.achun.tools.transfer.service.CSVService;
 import site.achun.tools.transfer.service.ExcelService;
+import site.achun.tools.transfer.service.ImportService;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Upload Controller
@@ -24,6 +34,8 @@ public class UploadController {
     private final CSVService csvService;
     private final ExcelService excelService;
 
+    private final ImportTaskService taskService;
+    private final ImportService importService;
     /**
      * 初始化导入模板
      * @param file 上传的excel文件
@@ -60,4 +72,56 @@ public class UploadController {
         }
     }
 
+    /**
+     * 初始化导入模板
+     * @param file 上传的excel文件
+     * @return 返回内容
+     */
+    @PostMapping("/upload/import")
+    public Rsp<UploadInitResponse> uploadImport(
+            @RequestParam("taskId")Integer taskId,
+            @RequestParam("file") MultipartFile file
+    ) {
+        if(taskId == null || file == null) {
+            return Rsp.error("params is null");
+        }
+        ImportTask task = taskService.lambdaQuery()
+                .eq(ImportTask::getId, taskId)
+                .one();
+        if(task == null) {
+            return Rsp.error("not exist task");
+        }
+        if(task.getStatus() != 1){
+            return Rsp.error("illegal task status");
+        }
+
+        String fileName = file.getOriginalFilename();
+
+        if (fileName == null) {
+            return Rsp.error("文件名不能为空");
+        }
+
+        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+
+        // 区分csv或者excel，获取数据内容
+        List<Map<String, String>> dataList = new ArrayList<>();
+
+        try {
+            if ("csv".equals(fileExtension)) {
+                dataList = csvService.readRows(file);
+            } else if ("xls".equals(fileExtension) || "xlsx".equals(fileExtension)) {
+                dataList = excelService.readRows(file);
+            } else {
+                return Rsp.error("不支持的文件类型");
+            }
+        } catch (Exception e) {
+            log.error("处理文件时出错: {}", e.getMessage(), e);
+            return Rsp.error("文件处理失败");
+        }
+
+        TableMappingInfo mappingInfo = JSON.parseObject(task.getTableInfo(), TableMappingInfo.class);
+        importService.importData(mappingInfo,dataList);
+
+        return Rsp.success(null);
+    }
 }

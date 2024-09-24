@@ -1,14 +1,17 @@
 <script lang="ts" setup>
-import {reactive, ref, watch} from 'vue';
+import {markRaw, reactive, ref, watch} from 'vue';
 import {ElMessage} from "element-plus";
-import axios from "axios";
+import axios, {get} from "axios";
+import type {DialogInfo, Task} from "@/views/TaskView.vue";
 
 // 定义 emit 用于触发事件通知父组件
 const emit = defineEmits(['formSubmitted']);
 
+const uploadRef = ref();
+
 // Props 类型
 interface Props {
-  taskId: number;
+  info: DialogInfo;
 }
 
 // 接收 Props
@@ -17,15 +20,7 @@ const props = defineProps<Props>();
 const status = reactive({
   showUpload:true, // 是否显示上传组件
   showTable:false, // 是否显示表编辑组件
-
 })
-interface Task {
-  id: number;
-  name: string;
-  status: string;
-  tableName: string;
-  taskName: string;
-}
 
 interface FieldMapping {
   fixed: false,
@@ -47,28 +42,16 @@ const dataTypes = [
 ];
 
 // 初始化任务对象
-const task = ref<Task>({
-  id: props.taskId,
-  name: '',
-  status: '待开始',
-  tableName: '',
-  taskName: '',
-});
+const task = ref<Task>({});
+const uploadUrl = ref<string>('');
 
-// 监听 taskId 变化，模拟加载任务数据和表字段映射
-watch(
-    () => props.taskId,
-    (newTaskId) => {
-      // 根据 taskId 加载任务的具体数据，这里可以使用 API 请求
-      task.value = {
-        id: newTaskId,
-        name: `任务 ${newTaskId}`,
-        status: '进行中',
-        tableName: '',
-      };
-    },
-    { immediate: true }
-);
+const importSuccess = ref<boolean>(false);
+const importedCount = ref(0);
+
+const handleUploadImportSuccess = (response: any) => {
+  importSuccess.value = true;
+  importedCount.value = 102;
+}
 
 const handleUploadSuccess = (response: any) => {
   status.showUpload = false;
@@ -112,11 +95,24 @@ const handleUploadError = (error: any) => {
 const resetForm = () => {
   // 重置表单和状态
   task.value.tableName = '';
-  task.value.taskName = '';
+  task.value.name = '';
   formRows.value = [];
   status.showUpload = true;
   status.showTable = false;
+  importSuccess.value = false;
+  importedCount.value = 0;
+  if (uploadRef.value) {
+    uploadRef.value.clearFiles(); // 清除上传文件状态
+  }
 };
+
+const whenClickSubmit = async () => {
+  if(props.info.type == 1){
+     await submitForm()
+  }else{
+    closeDialog()
+  }
+}
 
 const submitForm = async () => {
   try {
@@ -125,7 +121,7 @@ const submitForm = async () => {
     // 提交数据到后端接口
     const response = await axios.post('/task/add', {
       tableName: task.value.tableName,
-      taskName: task.value.taskName,
+      taskName: task.value.name,
       fields: checkFormRows
     });
 
@@ -142,6 +138,38 @@ const submitForm = async () => {
     console.error(error);
   }
 };
+
+const closeDialog = () => {
+  resetForm();
+  // 通过 emit 通知父组件表单提交成功
+  emit('formSubmitted');
+}
+
+const getUploadActionUrl = (type:number) => {
+  console.log("type:",type);
+  switch (type){
+    case 1:
+    case 2:
+      return API_HOST +'/upload/init';
+    case 3:
+      return API_HOST +'/upload/import';
+  }
+}
+
+// 监听 taskId 变化，模拟加载任务数据和表字段映射
+watch(
+    () => props.info,
+    (newInfo) => {
+      resetForm()
+      console.log("newInfo:",newInfo);
+      uploadUrl.value = getUploadActionUrl(newInfo.type)
+      if(newInfo.task){
+        task.value = newInfo.task;
+      }
+    },
+    { immediate: true }
+);
+
 </script>
 
 <template>
@@ -150,7 +178,7 @@ const submitForm = async () => {
     <!-- 表名输入框 -->
     <el-form :model="task" label-width="80px" inline>
       <el-form-item label="任务名" style="width: 45%;">
-        <el-input v-model="task.taskName" placeholder="请输入任务名"></el-input>
+        <el-input v-model="task.name" placeholder="请输入任务名"></el-input>
       </el-form-item>
       <el-form-item label="表名" style="width: 45%;">
         <el-input v-model="task.tableName" placeholder="请输入表名"></el-input>
@@ -161,10 +189,12 @@ const submitForm = async () => {
     <!-- 文件上传区域 -->
     <el-upload
       v-if="status.showUpload"
+      ref="uploadRef"
       class="upload-demo"
       drag
-      :action="API_HOST +'/upload/init'"
-      :on-success="handleUploadSuccess"
+      :action="uploadUrl"
+      :data="{taskId: task.id}"
+      :on-success="info.type == 1 ? handleUploadSuccess : handleUploadImportSuccess"
       :on-error="handleUploadError"
       :limit="1"
       :auto-upload="true"
@@ -174,6 +204,10 @@ const submitForm = async () => {
       <div class="el-upload__text">点击或者拖拽文件到此处上传</div>
       <div class="el-upload__tip">只支持Excel文件（.xls, .xlsx, .csv）</div>
     </el-upload>
+
+    <div>
+      <el-alert v-if="importSuccess" :title="'导入成功，添加了' + importedCount + '条数据'" type="success" show-icon></el-alert>
+    </div>
 
     <div class="form-container" v-if="status.showTable">
 
@@ -214,7 +248,7 @@ const submitForm = async () => {
     <!-- 底部按钮 -->
     <div class="form-footer">
       <el-button @click="resetForm">重置</el-button>
-      <el-button type="primary" @click="submitForm">提交</el-button>
+      <el-button type="primary" @click="whenClickSubmit">{{info.type == 1 ? '提交' : '确认' }}</el-button>
     </div>
 
   </div>
