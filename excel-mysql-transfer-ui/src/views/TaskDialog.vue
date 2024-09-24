@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import {markRaw, reactive, ref, watch} from 'vue';
+import {reactive, ref, watch} from 'vue';
 import {ElMessage} from "element-plus";
-import axios, {get} from "axios";
+import axios from "axios";
 import type {DialogInfo, Task} from "@/views/TaskView.vue";
 
 // 定义 emit 用于触发事件通知父组件
@@ -166,6 +166,12 @@ watch(
       if(newInfo.task){
         task.value = newInfo.task;
       }
+      if(newInfo.type == 2){
+        status.showUpload = false;
+        status.showTable = true;
+        formRows.value = JSON.parse(<string>newInfo.task?.tableInfo).fields;
+        formRows.value.map(a=>a.fixed = true)
+      }
     },
     { immediate: true }
 );
@@ -178,10 +184,10 @@ watch(
     <!-- 表名输入框 -->
     <el-form :model="task" label-width="80px" inline>
       <el-form-item label="任务名" style="width: 45%;">
-        <el-input v-model="task.name" placeholder="请输入任务名"></el-input>
+        <el-input v-model="task.name" :disabled="info.type != 1" placeholder="请输入任务名"></el-input>
       </el-form-item>
       <el-form-item label="表名" style="width: 45%;">
-        <el-input v-model="task.tableName" placeholder="请输入表名"></el-input>
+        <el-input v-model="task.tableName" :disabled="info.type != 1" placeholder="请输入表名"></el-input>
       </el-form-item>
     </el-form>
     <!-- 使用 el-divider 添加横线 -->
@@ -222,10 +228,10 @@ watch(
 
       <div class="form-row" v-for="(row, index) in formRows" :key="index">
         <!-- Checkbox -->
-        <el-checkbox v-model="row.checked" :style="{ visibility: row.fixed ? 'hidden' : 'visible' }"></el-checkbox>
+        <el-checkbox v-model="row.checked" :disabled="row.fixed" :style="{ visibility: row.header ? 'visible' : 'hidden' }"></el-checkbox>
 
         <!-- Excel Column -->
-        <el-input v-model="row.header" :style="{ visibility: row.fixed ? 'hidden' : 'visible' ,width:'170px'}" placeholder="Excel" />
+        <el-input v-model="row.header" :disabled="row.fixed" :style="{ visibility: row.header ? 'visible' : 'hidden' ,width:'170px'}" placeholder="Excel" />
 
         <!-- MySQL Column -->
         <el-input v-model="row.field" :disabled="row.fixed" style="width: 170px" placeholder="MySQL" />

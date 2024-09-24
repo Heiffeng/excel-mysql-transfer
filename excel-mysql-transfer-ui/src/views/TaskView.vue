@@ -8,11 +8,12 @@ export interface Task {
   id: number
   name: string
   status: string,
-  tableName: string
+  tableName: string,
+  tableInfo: string
 }
 
 export interface DialogInfo {
-  type: number // 1. 新增任务， 2. 编辑任务  3.数据导入
+  type: number // 1. 新增任务， 2. 查看任务  3.数据导入
   title: string
   task: Task | null
 }
@@ -20,8 +21,9 @@ export interface DialogInfo {
 const dialogVisible = ref(false);
 
 const dialogInfo = ref<DialogInfo>({
-  type: 0,
-  title: ''
+  type:1,
+  title:'新建任务',
+  task:null,
 });
 
 const tasks = ref<Task[]>([]);
@@ -29,7 +31,7 @@ const total = ref(0);
 const pageSize = ref(10);
 const currentPage = ref(1);
 
-const openDialog = (info : DialogInfo | null) => {
+const openDialog = (info : DialogInfo) => {
   dialogInfo.value = info;
   dialogVisible.value = true;
 };
@@ -103,7 +105,7 @@ onMounted(() => {
 </script>
 
 <template> <div class="task-page">
-  <el-button type="primary" @click="openDialog({title:'新建任务',type:1})" class="create-btn">新建任务</el-button>
+  <el-button type="primary" @click="openDialog({title:'新建任务',type:1, task:null})" class="create-btn">新建任务</el-button>
   <el-table :data="tasks" style="width: 100%" class="task-table">
     <el-table-column prop="id" label="ID" width="50"></el-table-column>
     <el-table-column prop="name" label="任务名称"></el-table-column>
@@ -119,7 +121,7 @@ onMounted(() => {
 
     <el-table-column label="操作" width="250">
       <template v-slot="scope">
-        <el-button @click="openDialog(scope.row.id)" type="text" class="action-btn">查看</el-button>
+        <el-button @click="openDialog({type:2,title:'查看任务',task:scope.row})" type="text" class="action-btn">查看</el-button>
 <!--        <el-button @click="openDialog(scope.row.id)" type="text" class="action-btn">禁用</el-button>-->
         <el-button @click="editTask(scope.row)" v-if="scope.row.status == 1" type="text" class="action-btn">导入</el-button>
         <el-button @click="deleteTask(scope.row)" type="text" class="action-btn">日志</el-button>
