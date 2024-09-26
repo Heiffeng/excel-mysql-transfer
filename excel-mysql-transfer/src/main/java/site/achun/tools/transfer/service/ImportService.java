@@ -71,7 +71,11 @@ public class ImportService {
                 Map<String, String> data = dataList.get(dataIndex);
                 for (int i = 0; i < fields.size(); i++) {
                     TableMappingInfo.Mapping field = fields.get(i);
-                    pstmt.setString(i + 1, data.get(field.getHeader()));  // 根据Excel字段名获取值
+                    if(data.containsKey(field.getHeader())) {
+                        pstmt.setString(i + 1, data.get(field.getHeader()));  // 根据Excel字段名获取值
+                    }else{
+                        pstmt.setString(i + 1, data.get(field.getField()));
+                    }
                 }
                 pstmt.addBatch(); // 添加到批处理
                 batchCount++;

@@ -1,5 +1,7 @@
 package site.achun.tools.transfer.controller;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,14 +17,16 @@ import site.achun.tools.transfer.generator.domain.ImportLog;
 import site.achun.tools.transfer.generator.domain.ImportTask;
 import site.achun.tools.transfer.generator.service.ImportLogService;
 import site.achun.tools.transfer.generator.service.ImportTaskService;
-import site.achun.tools.transfer.service.CSVService;
-import site.achun.tools.transfer.service.ExcelService;
+import site.achun.tools.transfer.service.FileService;
 import site.achun.tools.transfer.service.ImportService;
+import site.achun.tools.transfer.utils.CompareUtil;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Upload Controller
@@ -34,8 +38,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UploadController {
 
-    private final CSVService csvService;
-    private final ExcelService excelService;
+    private final FileService fileService;
 
     private final ImportTaskService taskService;
     private final ImportService importService;
@@ -59,22 +62,12 @@ public class UploadController {
             return Rsp.error("文件名不能为空");
         }
 
-        // Check the file extension to determine the file type
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-
         try {
-            if ("csv".equals(fileExtension)) {
-                response.setHeaders(csvService.readHeaders(file));
-                return Rsp.success(response);
-            } else if ("xls".equals(fileExtension) || "xlsx".equals(fileExtension)) {
-                response.setHeaders(excelService.readHeaders(file));
-                return Rsp.success(response);
-            } else {
-                return Rsp.error("不支持的文件类型");
-            }
-        } catch (Exception e) {
-            log.error("处理文件时出错: {}", e.getMessage(), e);
-            return Rsp.error("文件处理失败");
+            List<String> headers = fileService.readHeaders(file);
+            response.setHeaders(headers);
+            return Rsp.success(response);
+        } catch (Exception ex) {
+            return Rsp.error(ex.getMessage());
         }
     }
 
@@ -89,9 +82,17 @@ public class UploadController {
             @RequestParam("file") MultipartFile file
     ) {
         long begin = System.currentTimeMillis();
+
+        // 校验必填参数
         if(taskId == null || file == null) {
             return Rsp.error("params is null");
         }
+        String fileName = file.getOriginalFilename();
+        if (fileName == null) {
+            return Rsp.error("文件名不能为空");
+        }
+
+        // 查询任务，并检查状态
         ImportTask task = taskService.lambdaQuery()
                 .eq(ImportTask::getId, taskId)
                 .one();
@@ -102,34 +103,41 @@ public class UploadController {
             return Rsp.error("illegal task status");
         }
 
-        String fileName = file.getOriginalFilename();
-
-        if (fileName == null) {
-            return Rsp.error("文件名不能为空");
+        // 校验文件行头是否匹配
+        TableMappingInfo mappingInfo = JSON.parseObject(task.getTableInfo(), TableMappingInfo.class);
+        try{
+            List<String> importHeaders = fileService.readHeaders(file);
+            List<String> mappingHeaders = mappingInfo.getFields().stream()
+                    .map(TableMappingInfo.Mapping::getHeader)
+                    .filter(StrUtil::isNotEmpty)
+                    .toList();
+            CompareUtil.Result<String> result = CompareUtil.cal(importHeaders, mappingHeaders, String::valueOf);
+            if(CollUtil.isNotEmpty(result.getTargetDifference()) || CollUtil.isNotEmpty(result.getSourceDifference())){
+                String importDiffHeaders = String.join(",", result.getSourceDifference());
+                String importDiffMappingHeaders = String.join(",", result.getTargetDifference());
+                return Rsp.error(String.format("映射错误. <br/> headers:%s <br/> fields:%s",importDiffHeaders,importDiffMappingHeaders));
+            }
+        }catch (Exception ex){
+            log.error("校验文件行头是否匹配异常",ex);
+            return Rsp.error(ex.getMessage());
         }
 
         // TODO 保存文件到本地
-
-
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
 
         // 区分csv或者excel，获取数据内容
         List<Map<String, String>> dataList = new ArrayList<>();
 
         try {
-            if ("csv".equals(fileExtension)) {
-                dataList = csvService.readRows(file);
-            } else if ("xls".equals(fileExtension) || "xlsx".equals(fileExtension)) {
-                dataList = excelService.readRows(file);
-            } else {
-                return Rsp.error("不支持的文件类型");
-            }
-        } catch (Exception e) {
-            log.error("处理文件时出错: {}", e.getMessage(), e);
-            return Rsp.error("文件处理失败");
+            dataList = fileService.readRows(file);
+            // 默认字段的处理
+            dataList.forEach(data->{
+                data.put("ctime",LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            });
+        } catch (Exception ex) {
+            log.error("处理文件时出错", ex);
+            return Rsp.error(ex.getMessage());
         }
 
-        TableMappingInfo mappingInfo = JSON.parseObject(task.getTableInfo(), TableMappingInfo.class);
 
         try{
             importService.importData(mappingInfo,dataList);

@@ -53,6 +53,7 @@ const importError = ref<boolean>(false);
 const importErrorMessage = ref('');
 
 const handleUploadImportSuccess = (response: any) => {
+  status.showUpload = false;
   console.log(response);
   if(response.code == 0){
     importSuccess.value = true;
@@ -92,8 +93,8 @@ const handleUploadSuccess = (response: any) => {
       checked: true,
       header: '',
       field: 'ctime',
-      dataType: 'datetime',
-      comment: ''
+      dataType: 'datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+      comment: '创建时间'
     },
   ]
 };
@@ -123,6 +124,8 @@ const resetForm = () => {
       uploadRef.value.clearFiles(); // 清除上传文件状态
     }
   }else{
+    status.showUpload = true;
+    status.showTable = false;
     importSuccess.value = false;
     importedCount.value = 0;
     importError.value = false;
@@ -240,7 +243,7 @@ watch(
 
     <div>
       <el-alert v-if="importSuccess" :title="'导入成功，添加了' + importedCount + '条数据'" type="success" show-icon></el-alert>
-      <el-alert v-if="importError" :title="importErrorMessage" type="error" show-icon></el-alert>
+      <el-alert v-if="importError" type="error" show-icon v-html="importErrorMessage"></el-alert>
     </div>
 
     <div class="form-container" v-if="status.showTable">
@@ -259,7 +262,7 @@ watch(
         <el-checkbox v-model="row.checked" :disabled="row.fixed" :style="{ visibility: row.header ? 'visible' : 'hidden' }"></el-checkbox>
 
         <!-- Excel Column -->
-        <el-input v-model="row.header" :disabled="row.fixed" :style="{ visibility: row.header ? 'visible' : 'hidden' ,width:'170px'}" placeholder="Excel" />
+        <el-input v-model="row.header" disabled :style="{ visibility: row.header ? 'visible' : 'hidden' ,width:'170px'}" placeholder="Excel" />
 
         <!-- MySQL Column -->
         <el-input v-model="row.field" :disabled="row.fixed" style="width: 170px" placeholder="MySQL" />
