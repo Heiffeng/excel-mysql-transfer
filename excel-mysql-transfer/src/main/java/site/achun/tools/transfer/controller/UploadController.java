@@ -130,7 +130,13 @@ public class UploadController {
         }
 
         TableMappingInfo mappingInfo = JSON.parseObject(task.getTableInfo(), TableMappingInfo.class);
-        importService.importData(mappingInfo,dataList);
+
+        try{
+            importService.importData(mappingInfo,dataList);
+        }catch (Exception ex){
+            log.error("文件导入失败",ex);
+            return Rsp.error(ex.getMessage());
+        }
 
         // 插入日志
         ImportLog importLog = ImportLog.builder()

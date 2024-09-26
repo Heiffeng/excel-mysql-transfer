@@ -49,11 +49,18 @@ const uploadUrl = ref<string>('');
 const importSuccess = ref<boolean>(false);
 const importedCount = ref(0);
 
+const importError = ref<boolean>(false);
+const importErrorMessage = ref('');
+
 const handleUploadImportSuccess = (response: any) => {
   console.log(response);
   if(response.code == 0){
     importSuccess.value = true;
     importedCount.value = response.data.count;
+  }else{
+    ElMessage.error(response.info);
+    importError.value = true;
+    importErrorMessage.value = response.info;
   }
 }
 
@@ -96,18 +103,35 @@ const handleUploadError = (error: any) => {
   console.error(error);
 };
 
+const handleUploadImportError = (error: any) => {
+  ElMessage.error(error);
+}
+
 const resetForm = () => {
-  // 重置表单和状态
-  task.value.tableName = '';
-  task.value.name = '';
-  formRows.value = [];
-  status.showUpload = true;
-  status.showTable = false;
-  importSuccess.value = false;
-  importedCount.value = 0;
-  if (uploadRef.value) {
-    uploadRef.value.clearFiles(); // 清除上传文件状态
+  if(props.info.type == 1){
+    // 重置表单和状态
+    task.value.tableName = '';
+    task.value.name = '';
+    formRows.value = [];
+    status.showUpload = true;
+    status.showTable = false;
+    importSuccess.value = false;
+    importedCount.value = 0;
+    importError.value = false;
+    importErrorMessage.value = '';
+    if (uploadRef.value) {
+      uploadRef.value.clearFiles(); // 清除上传文件状态
+    }
+  }else{
+    importSuccess.value = false;
+    importedCount.value = 0;
+    importError.value = false;
+    importErrorMessage.value = '';
+    if (uploadRef.value) {
+      uploadRef.value.clearFiles(); // 清除上传文件状态
+    }
   }
+
 };
 
 const whenClickSubmit = async () => {
@@ -179,7 +203,6 @@ watch(
     },
     { immediate: true }
 );
-
 </script>
 
 <template>
@@ -205,7 +228,7 @@ watch(
       :action="uploadUrl"
       :data="{taskId: task.id}"
       :on-success="info.type == 1 ? handleUploadSuccess : handleUploadImportSuccess"
-      :on-error="handleUploadError"
+      :on-error="info.type == 1 ? handleUploadError : handleUploadImportError"
       :limit="1"
       :auto-upload="true"
       accept=".xls,.xlsx,.csv"
@@ -217,6 +240,7 @@ watch(
 
     <div>
       <el-alert v-if="importSuccess" :title="'导入成功，添加了' + importedCount + '条数据'" type="success" show-icon></el-alert>
+      <el-alert v-if="importError" :title="importErrorMessage" type="error" show-icon></el-alert>
     </div>
 
     <div class="form-container" v-if="status.showTable">

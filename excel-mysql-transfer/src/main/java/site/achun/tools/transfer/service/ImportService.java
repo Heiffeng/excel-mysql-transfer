@@ -37,7 +37,7 @@ public class ImportService {
      * @param dataList 数据列表
      */
     @Transactional
-    public void importData(TableMappingInfo mappingInfo, List<Map<String,String>> dataList){
+    public void importData(TableMappingInfo mappingInfo, List<Map<String,String>> dataList) throws SQLException {
         // 检查数据
         if (dataList == null || dataList.isEmpty()) {
             log.warn("数据列表为空，跳过导入");
@@ -91,9 +91,9 @@ public class ImportService {
                 log.info("剩余数据插入成功，共插入{}条数据", dataList.size());
             }
 
-        } catch (SQLException e) {
-            log.error("数据插入失败，回滚事务", e);
-            throw new RuntimeException("数据插入失败", e);  // 捕获异常，触发事务回滚
+        } catch (SQLException ex) {
+            log.error("数据插入失败，回滚事务", ex);
+            throw ex;
         }
     }
 }
