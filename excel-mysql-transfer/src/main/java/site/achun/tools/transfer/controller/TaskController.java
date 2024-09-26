@@ -15,12 +15,18 @@ import site.achun.tools.transfer.common.RspPage;
 import site.achun.tools.transfer.controller.request.AddTaskRequest;
 import site.achun.tools.transfer.controller.request.QueryTaskPage;
 import site.achun.tools.transfer.controller.response.TaskResponse;
+import site.achun.tools.transfer.generator.domain.ImportLog;
 import site.achun.tools.transfer.generator.domain.ImportTask;
+import site.achun.tools.transfer.generator.service.ImportLogService;
 import site.achun.tools.transfer.generator.service.ImportTaskService;
 import site.achun.tools.transfer.service.TaskAddService;
 import site.achun.tools.transfer.utils.PageUtil;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Task CURD Controller
@@ -34,6 +40,7 @@ public class TaskController {
 
     private final TaskAddService taskAddService;
     private final ImportTaskService importTaskService;
+    private final ImportLogService importLogService;
 
     /**
      * 新增任务
@@ -99,7 +106,44 @@ public class TaskController {
                 .eq(StrUtil.isNotEmpty(query.getCreator()), ImportTask::getCreator, query.getCreator())
                 .orderByDesc(ImportTask::getCtime)
                 .page(Page.of(query.getPageIndex(), query.getPageSize()));
-        return Rsp.success(PageUtil.parse(pageResult, v -> BeanUtil.toBean(v, TaskResponse.class),query.getPageIndex(),query.getPageSize()));
+
+        List<Integer> taskIds = pageResult.getRecords().stream()
+                .map(ImportTask::getId)
+                .toList();
+
+        Map<Integer, Long> map = getTaskLastImportCountMap(taskIds);
+        RspPage<TaskResponse> result = PageUtil.parse(pageResult, v -> BeanUtil.toBean(v, TaskResponse.class), query.getPageIndex(), query.getPageSize());
+        result.getRows()
+                .forEach(task->{
+                    if(map.containsKey(task.getId())){
+                        task.setLastImportCount(map.get(task.getId()));
+                    }
+                });
+        return Rsp.success(result);
+    }
+
+    /**
+     * 获取任务的最后一次导入数量的 Map 映射
+     *
+     * @param taskIds 任务 ID 列表
+     * @return Map<taskId, lastImportCount>
+     */
+    private Map<Integer, Long> getTaskLastImportCountMap(List<Integer> taskIds) {
+        // 查询导入日志中每个 taskId 的最大导入数量
+        List<ImportLog> importLogs = importLogService.lambdaQuery()
+                .select(ImportLog::getTaskId, ImportLog::getCount)
+                .in(ImportLog::getTaskId, taskIds)
+                .orderByDesc(ImportLog::getCtime)
+                .list();
+
+        // 构建 taskId -> lastImportCount 的映射
+        Map<Integer, Long> lastImportCountMap = new HashMap<>();
+        for (ImportLog log : importLogs) {
+            // 只保留最后一次的导入数量
+            lastImportCountMap.putIfAbsent(log.getTaskId(), log.getCount().longValue());
+        }
+
+        return lastImportCountMap;
     }
 
 }

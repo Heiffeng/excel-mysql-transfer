@@ -101,7 +101,7 @@ onMounted(() => {
     <el-table-column prop="name" label="任务名称"></el-table-column>
     <el-table-column prop="tableName" label="表名"></el-table-column>
     <el-table-column prop="creator" label="负责人"></el-table-column>
-    <el-table-column prop="name" label="记录数"></el-table-column>
+    <el-table-column prop="lastImportCount" label="记录数"></el-table-column>
     <el-table-column prop="utime" label="更新时间" width="180"></el-table-column>
     <el-table-column prop="status" label="状态">
       <template v-slot="scope">

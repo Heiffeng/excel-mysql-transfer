@@ -8,12 +8,13 @@
             <id property="id" column="id" jdbcType="INTEGER"/>
             <result property="taskId" column="task_id" jdbcType="INTEGER"/>
             <result property="count" column="count" jdbcType="INTEGER"/>
+            <result property="fileName" column="file_name" jdbcType="VARCHAR"/>
             <result property="creator" column="creator" jdbcType="VARCHAR"/>
             <result property="ctime" column="ctime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,task_id,count,
-        creator,ctime
+        file_name,creator,ctime
     </sql>
 </mapper>

@@ -60,9 +60,6 @@ const handlePageChange = (newPageIndex: number) => {
   fetchData();
 };
 
-// 监听 taskId 的变化
-// watch(() => props.taskId, fetchData, { immediate: true });
-
 watch(
     () => props.visible,
     () => {
@@ -75,11 +72,3 @@ watch(
 // 组件挂载时获取数据
 onMounted(fetchData);
 </script>
-
-<style scoped>
-.el-header {
-  background-color: #f0f2f5;
-  padding: 20px;
-  text-align: center;
-}
-</style>
