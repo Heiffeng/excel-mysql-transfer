@@ -109,32 +109,20 @@ const handleUploadImportError = (error: any) => {
 }
 
 const resetForm = () => {
-  if(props.info.type == 1){
-    // 重置表单和状态
-    task.value.tableName = '';
-    task.value.name = '';
+  // 仅在新建任务时才重置表单和状态
+  if (props.info.type == 1) {
+    task.value = {}; // 新建任务时可以清空 task
     formRows.value = [];
-    status.showUpload = true;
-    status.showTable = false;
-    importSuccess.value = false;
-    importedCount.value = 0;
-    importError.value = false;
-    importErrorMessage.value = '';
-    if (uploadRef.value) {
-      uploadRef.value.clearFiles(); // 清除上传文件状态
-    }
-  }else{
-    status.showUpload = true;
-    status.showTable = false;
-    importSuccess.value = false;
-    importedCount.value = 0;
-    importError.value = false;
-    importErrorMessage.value = '';
-    if (uploadRef.value) {
-      uploadRef.value.clearFiles(); // 清除上传文件状态
-    }
   }
-
+  status.showUpload = true;
+  status.showTable = false;
+  importSuccess.value = false;
+  importedCount.value = 0;
+  importError.value = false;
+  importErrorMessage.value = '';
+  if (uploadRef.value) {
+    uploadRef.value.clearFiles(); // 清除上传文件状态
+  }
 };
 
 const whenClickSubmit = async () => {
@@ -171,6 +159,8 @@ const submitForm = async () => {
 };
 
 const closeDialog = () => {
+  // 还原 task 数据
+  task.value = JSON.parse(JSON.stringify(taskCopy.value));
   resetForm();
   // 通过 emit 通知父组件表单提交成功
   emit('formSubmitted');
@@ -186,22 +176,23 @@ const getUploadActionUrl = (type:number) => {
       return API_HOST +'/upload/import';
   }
 }
-
+const taskCopy = ref<Task>({});
 // 监听 taskId 变化，模拟加载任务数据和表字段映射
 watch(
     () => props.info,
     (newInfo) => {
-      resetForm()
-      console.log("newInfo:",newInfo);
-      uploadUrl.value = getUploadActionUrl(newInfo.type)
-      if(newInfo.task){
+      resetForm();
+      uploadUrl.value = getUploadActionUrl(newInfo.type);
+      // 备份 task 数据
+      taskCopy.value = JSON.parse(JSON.stringify(newInfo.task || {}));
+      if (newInfo.task) {
         task.value = newInfo.task;
       }
-      if(newInfo.type == 2){
+      if (newInfo.type == 2) {
         status.showUpload = false;
         status.showTable = true;
         formRows.value = JSON.parse(<string>newInfo.task?.tableInfo).fields;
-        formRows.value.map(a=>a.fixed = true)
+        formRows.value.map(a => a.fixed = true);
       }
     },
     { immediate: true }
