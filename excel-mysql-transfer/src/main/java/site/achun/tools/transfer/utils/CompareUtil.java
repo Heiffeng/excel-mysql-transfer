@@ -7,6 +7,7 @@ import lombok.Data;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -33,8 +34,10 @@ public class CompareUtil {
         }
         // 转换为map类型，偏于接下来的步骤用key值对比
         Map<Object, T> sourceMap = source.stream()
+                .filter(Objects::nonNull)
                 .collect(Collectors.toMap(comparator, v -> v));
         Map<Object, T> targetMap = target.stream()
+                .filter(Objects::nonNull)
                 .collect(Collectors.toMap(comparator, v -> v));
         // 取并集
         List<T> intersection = sourceMap.entrySet().stream()
