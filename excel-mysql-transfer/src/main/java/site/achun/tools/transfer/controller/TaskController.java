@@ -1,6 +1,7 @@
 package site.achun.tools.transfer.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
@@ -110,15 +111,16 @@ public class TaskController {
         List<Integer> taskIds = pageResult.getRecords().stream()
                 .map(ImportTask::getId)
                 .toList();
-
-        Map<Integer, Long> map = getTaskLastImportCountMap(taskIds);
         RspPage<TaskResponse> result = PageUtil.parse(pageResult, v -> BeanUtil.toBean(v, TaskResponse.class), query.getPageIndex(), query.getPageSize());
-        result.getRows()
-                .forEach(task->{
-                    if(map.containsKey(task.getId())){
-                        task.setLastImportCount(map.get(task.getId()));
-                    }
-                });
+        if(CollUtil.isNotEmpty(taskIds)){
+            Map<Integer, Long> map = getTaskLastImportCountMap(taskIds);
+            result.getRows()
+                    .forEach(task->{
+                        if(map.containsKey(task.getId())){
+                            task.setLastImportCount(map.get(task.getId()));
+                        }
+                    });
+        }
         return Rsp.success(result);
     }
 
