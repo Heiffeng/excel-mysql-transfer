@@ -24,7 +24,7 @@ const status = reactive({
 })
 
 interface FieldMapping {
-  fixed: false,
+  fixed: boolean,
   checked: boolean,
   header: string,
   field: string,
@@ -44,7 +44,7 @@ const dataTypes = [
 
 // 初始化任务对象
 const task = ref<Task>({});
-const uploadUrl = ref<string>('');
+const uploadUrl = ref<string | undefined>('');
 
 const importSuccess = ref<boolean>(false);
 const importedCount = ref(0);
@@ -139,8 +139,8 @@ const submitForm = async () => {
     const checkFormRows = formRows.value.filter((t: FieldMapping) => t.checked)
     // 提交数据到后端接口
     const response = await axios.post('/task/add', {
-      tableName: task.value.tableName,
-      taskName: task.value.name,
+      tableName: task!.value!.tableName,
+      taskName: task!.value!.name,
       fields: checkFormRows
     });
 
@@ -176,7 +176,7 @@ const getUploadActionUrl = (type:number) => {
       return API_HOST +'/upload/import';
   }
 }
-const taskCopy = ref<Task>({});
+const taskCopy = ref<Task | null>(null);
 // 监听 taskId 变化，模拟加载任务数据和表字段映射
 watch(
     () => props.info,
@@ -205,10 +205,10 @@ watch(
     <!-- 表名输入框 -->
     <el-form :model="task" label-width="80px" inline>
       <el-form-item label="任务名" style="width: 45%;">
-        <el-input v-model="task.name" :disabled="info.type != 1" placeholder="请输入任务名"></el-input>
+        <el-input v-model="task!.name" :disabled="info.type != 1" placeholder="请输入任务名"></el-input>
       </el-form-item>
       <el-form-item label="表名" style="width: 45%;">
-        <el-input v-model="task.tableName" :disabled="info.type != 1" placeholder="请输入表名"></el-input>
+        <el-input v-model="task!.tableName" :disabled="info.type != 1" placeholder="请输入表名"></el-input>
       </el-form-item>
     </el-form>
     <!-- 使用 el-divider 添加横线 -->
@@ -220,7 +220,7 @@ watch(
       class="upload-demo"
       drag
       :action="uploadUrl"
-      :data="{taskId: task.id}"
+      :data="{taskId: task!.id}"
       :on-success="info.type == 1 ? handleUploadSuccess : handleUploadImportSuccess"
       :on-error="info.type == 1 ? handleUploadError : handleUploadImportError"
       :limit="1"
