@@ -1,5 +1,6 @@
 package site.achun.tools.transfer.service;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Excel Service
@@ -34,8 +36,9 @@ public class ExcelService {
             }
 
             // 获取第一行
-            Map<Integer, String> firstRow = rows.getFirst();
-            return new ArrayList<>(firstRow.values());
+            return rows.getFirst().values().stream()
+                    .filter(StrUtil::isNotEmpty)
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             log.error("读取Excel文件失败: {}", e.getMessage(), e);
             return Collections.emptyList();
