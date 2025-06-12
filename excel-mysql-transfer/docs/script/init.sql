@@ -10,7 +10,6 @@ CREATE TABLE `import_task` (
                                PRIMARY KEY (`id`)
 );
 
-
 CREATE TABLE `import_log` (
                               `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
                               `task_id` int NOT NULL COMMENT '任务ID',
