@@ -1,7 +1,10 @@
 package site.achun.tools.transfer.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.enums.CellExtraTypeEnum;
+import com.alibaba.excel.metadata.CellExtra;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,12 +50,34 @@ public class ExcelService {
 
     public List<Map<String,String>> readRows(MultipartFile file) {
         try (InputStream inputStream = file.getInputStream()) {
+            MergedCellFillListener listener = new MergedCellFillListener();
             // 读取 Excel 第一行
-            List<Map<Integer, String>> rows = EasyExcel.read(inputStream)
+            List<Map<Integer, String>> rows = EasyExcel.read(inputStream, listener)
+                    .extraRead(CellExtraTypeEnum.MERGE)
                     .headRowNumber(0) // 设定头部行数为 0，表示不跳过任何行
                     .sheet(0) // 选择第一个 sheet
                     .doReadSync(); // 同步读取返回所有数据
 
+            if(CollUtil.isNotEmpty(listener.getExtraMergeInfoList())){
+                log.info("合并单元格不为空,size:{}", listener.getExtraMergeInfoList().size());
+                for (CellExtra region : listener.getExtraMergeInfoList()) {
+                    int firstRow = region.getFirstRowIndex();
+                    int lastRow = region.getLastRowIndex();
+                    int firstCol = region.getFirstColumnIndex();
+                    int lastCol = region.getLastColumnIndex();
+
+                    String mergeValue = rows.get(firstRow).get(firstCol); // 左上角值
+
+                    for (int row = firstRow; row <= lastRow; row++) {
+                        Map<Integer, String> rowMap = rows.get(row);
+                        for (int col = firstCol; col <= lastCol; col++) {
+                            if (!StrUtil.isNotEmpty(rowMap.get(col))) {
+                                rowMap.put(col, mergeValue);
+                            }
+                        }
+                    }
+                }
+            }
             // 判断文件是否为空
             if (rows.isEmpty()) {
                 return Collections.emptyList();
