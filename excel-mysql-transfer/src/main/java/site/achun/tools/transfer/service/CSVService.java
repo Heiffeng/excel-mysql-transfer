@@ -34,6 +34,7 @@ public class CSVService {
             }
         } catch (IOException e) {
             log.error("读取CSV文件失败: {}", e.getMessage(), e);
+            throw new RuntimeException("读取CSV文件失败: " + e.getMessage(), e);
         }
 
         return firstRow;
@@ -73,6 +74,7 @@ public class CSVService {
             }
         } catch (IOException e) {
             log.error("读取CSV文件失败: {}", e.getMessage(), e);
+            throw new RuntimeException("读取CSV文件失败: " + e.getMessage(), e);
         }
 
         return result;

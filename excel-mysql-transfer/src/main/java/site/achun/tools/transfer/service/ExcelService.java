@@ -44,7 +44,7 @@ public class ExcelService {
                     .collect(Collectors.toList());
         } catch (IOException e) {
             log.error("读取Excel文件失败: {}", e.getMessage(), e);
-            return Collections.emptyList();
+            throw new RuntimeException("读取Excel文件失败: " + e.getMessage(), e);
         }
     }
 
@@ -108,7 +108,7 @@ public class ExcelService {
             return result;
         } catch (IOException e) {
             log.error("读取Excel文件失败: {}", e.getMessage(), e);
-            return Collections.emptyList();
+            throw new RuntimeException("读取Excel文件失败: " + e.getMessage(), e);
         }
     }
 }
